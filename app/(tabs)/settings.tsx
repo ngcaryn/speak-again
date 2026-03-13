@@ -62,8 +62,8 @@ function SegmentControl<T extends string>({
   );
 }
 
-/** Tolerance for floating-point voice speed comparison */
-const SPEED_COMPARISON_THRESHOLD = 0.05;
+/** Tolerance for floating-point voice speed comparison (avoids exact equality issues) */
+const VOICE_SPEED_EPSILON = 0.05;
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -179,7 +179,7 @@ export default function SettingsScreen() {
               return (
                 <TouchableOpacity
                   key={speed}
-                  style={[styles.speedButton, Math.abs(settings.voiceSpeed - speed) < SPEED_COMPARISON_THRESHOLD && styles.speedButtonActive]}
+                  style={[styles.speedButton, Math.abs(settings.voiceSpeed - speed) < VOICE_SPEED_EPSILON && styles.speedButtonActive]}
                   onPress={() => updateSettings({ voiceSpeed: speed })}
                 >
                   <Text style={[styles.speedText, { fontSize: scale(16) }]}>{labels[i]}</Text>

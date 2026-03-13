@@ -112,10 +112,11 @@ export default function SpeechScreen() {
       const uri = recording.getURI();
       setRecording(null);
 
-      // For demo/offline, simulate speech recognition result.
-      // In production: pass `uri` to BaiduASRProvider.recognize(uri, language)
-      // which returns a SpeechResult with the transcribed text to compare against currentWord.
-      const simulatedSpoken = currentWord;
+      // TODO (production): Replace simulatedSpoken with actual ASR output.
+      // Pass `uri` to the configured SpeechProvider.recognize(uri, language),
+      // which returns a SpeechResult.text to compare against currentWord.
+      // Example: const { text: simulatedSpoken } = await speechProvider.recognize(uri, i18n.language);
+      const simulatedSpoken = currentWord; // Placeholder: treats target as spoken for demo/offline mode
       setSpokenText(simulatedSpoken);
 
       const result = await ai.generateSpeechFeedback(

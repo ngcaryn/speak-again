@@ -40,10 +40,6 @@
         {
           "cameraPermission": "Allow Speak Again to access your camera to detect gestures."
         }
-      ],
-      [
-        "expo-speech",
-        {}
       ]
     ],
     "scheme": "speak-again",
