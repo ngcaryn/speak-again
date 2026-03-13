@@ -12,8 +12,8 @@ export class DeviceProvider implements SpeechProvider {
   readonly isAvailableInChina = true;
 
   async recognize(_audioUri: string, _language: string): Promise<SpeechResult> {
-    // Device-level speech recognition is handled by the Audio Recording hook
-    // This provider serves as a fallback indicator
+    // Device speech recognition is driven by the UI layer using Expo's Voice APIs.
+    // Returning empty results here signals the caller to use the native recognition flow.
     return {
       text: '',
       confidence: 0,

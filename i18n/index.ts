@@ -22,6 +22,8 @@ i18n.use(initReactI18next).init({
   lng: 'zh-TW',
   fallbackLng: 'en',
   interpolation: {
+    // React Native has no DOM, so HTML-based XSS is not applicable here.
+    // escapeValue is set to false to allow emoji and special characters in translations.
     escapeValue: false,
   },
 });

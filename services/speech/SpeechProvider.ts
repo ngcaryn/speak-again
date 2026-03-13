@@ -1,3 +1,4 @@
+/** 'whisper' is reserved for future Whisper API integration */
 export type SpeechProviderType = 'baidu' | 'whisper' | 'device';
 
 export interface SpeechConfig {
