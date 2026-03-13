@@ -7,7 +7,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "sync:watch": "powershell -ExecutionPolicy Bypass -File ./scripts/auto-sync.ps1"
+    "sync:watch": "powershell -ExecutionPolicy Bypass -File ./scripts/auto-sync.ps1",
+    "sync:task:register": "powershell -ExecutionPolicy Bypass -File ./scripts/register-autosync-task.ps1",
+    "sync:startup:disable": "powershell -ExecutionPolicy Bypass -File ./scripts/disable-startup-launcher.ps1"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
