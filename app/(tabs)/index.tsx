@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,7 +16,7 @@ import { useFontSize } from '../../hooks/useFontSize';
 const { width } = Dimensions.get('window');
 
 interface FeatureCardProps {
-  emoji: string;
+  iconName: React.ComponentProps<typeof Ionicons>['name'];
   title: string;
   description: string;
   route: string;
@@ -23,7 +24,7 @@ interface FeatureCardProps {
   onPress: () => void;
 }
 
-function FeatureCard({ emoji, title, description, color, onPress }: FeatureCardProps) {
+function FeatureCard({ iconName, title, description, color, onPress }: FeatureCardProps) {
   const { scale } = useFontSize();
   return (
     <TouchableOpacity
@@ -32,7 +33,7 @@ function FeatureCard({ emoji, title, description, color, onPress }: FeatureCardP
       style={[styles.featureCard, { borderLeftColor: color, borderLeftWidth: 6 }]}
       accessibilityRole="button"
     >
-      <Text style={styles.featureEmoji}>{emoji}</Text>
+      <Ionicons name={iconName} size={34} color={color} style={styles.featureIcon} />
       <View style={styles.featureText}>
         <Text style={[styles.featureTitle, { fontSize: scale(20) }]}>{title}</Text>
         <Text style={[styles.featureDesc, { fontSize: scale(15) }]}>{description}</Text>
@@ -52,28 +53,28 @@ export default function HomeScreen() {
 
   const features = [
     {
-      emoji: '🗣️',
+      iconName: 'mic',
       title: t('home.speechPractice'),
       description: t('home.speechPracticeDesc'),
       route: '/speech',
       color: Colors.primary,
     },
     {
-      emoji: '🖼️',
+      iconName: 'images',
       title: t('home.pictureBoard'),
       description: t('home.pictureBoardDesc'),
       route: '/pictures',
       color: Colors.secondary,
     },
     {
-      emoji: '🧠',
+      iconName: 'grid',
       title: t('home.brainExercises'),
       description: t('home.brainExercisesDesc'),
       route: '/cognitive',
       color: Colors.accent,
     },
     {
-      emoji: '📷',
+      iconName: 'camera',
       title: t('home.gestureCamera'),
       description: t('home.gestureCameraDesc'),
       route: '/camera',
@@ -95,7 +96,7 @@ export default function HomeScreen() {
           {progress.currentStreak > 0 && (
             <View style={styles.streakBadge}>
               <Text style={[styles.streakText, { fontSize: scale(16) }]}>
-                🔥 {progress.currentStreak} {t('home.streak')}
+                {progress.currentStreak} {t('home.streak')}
               </Text>
             </View>
           )}
@@ -104,19 +105,19 @@ export default function HomeScreen() {
         {/* Today's stats */}
         <View style={styles.statsRow}>
           <StatCard
-            emoji="⏱️"
+            iconName="time"
             value={todayMinutes}
             label={t('home.minutesPracticed')}
             color={Colors.primary}
           />
           <StatCard
-            emoji="🏆"
+            iconName="trophy"
             value={progress.exercisesCompleted}
             label={t('progress.exercisesCompleted')}
             color={Colors.secondary}
           />
           <StatCard
-            emoji="🔥"
+            iconName="flame"
             value={progress.currentStreak}
             label={t('home.streak')}
             color={Colors.accent}
@@ -126,7 +127,7 @@ export default function HomeScreen() {
         {/* Encouragement */}
         <Card style={styles.encouragementCard}>
           <Text style={[styles.encouragement, { fontSize: scale(18) }]}>
-            💪 {t('home.encouragement')}
+            {t('home.encouragement')}
           </Text>
         </Card>
 
@@ -213,8 +214,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  featureEmoji: {
-    fontSize: 40,
+  featureIcon: {
     marginRight: 16,
   },
   featureText: {
