@@ -42,13 +42,24 @@ export abstract class BaseAIProvider implements AIProvider {
   abstract chat(message: string, context?: string): Promise<AIResponse>;
 
   async generateSpeechFeedback(targetText: string, spokenText: string, language: string): Promise<SpeechFeedback> {
-    const similarity = this.calculateSimilarity(targetText.toLowerCase(), spokenText.toLowerCase());
+    const normalizedTarget = this.normalizeSpeechText(targetText, language);
+    const normalizedSpoken = this.normalizeSpeechText(spokenText, language);
+    const similarity = this.calculateSimilarity(normalizedTarget, normalizedSpoken, language);
     const score = Math.round(similarity * 100);
 
     let feedback: string;
     let suggestions: string[] = [];
 
-    if (score >= 90) {
+    if (!normalizedSpoken) {
+      feedback = language === 'en' ? 'I could not hear clear speech. Please try again.' :
+                 language === 'zh-TW' ? '我沒有聽清楚，請再試一次。' : '我没有听清楚，请再试一次。';
+      suggestions = [
+        language === 'en' ? 'Speak closer to the microphone' :
+        language === 'zh-TW' ? '請靠近麥克風說話' : '请靠近麦克风说话',
+        language === 'en' ? 'Use a quiet environment' :
+        language === 'zh-TW' ? '請在安靜環境中練習' : '请在安静环境中练习',
+      ];
+    } else if (score >= 90) {
       feedback = language === 'en' ? 'Excellent! Perfect pronunciation!' :
                  language === 'zh-TW' ? '太棒了！發音非常準確！' : '太棒了！发音非常准确！';
     } else if (score >= 70) {
@@ -86,17 +97,61 @@ export abstract class BaseAIProvider implements AIProvider {
              language === 'zh-TW' ? '我看到您需要幫助' : '我看到您需要帮助' };
   }
 
-  protected calculateSimilarity(a: string, b: string): number {
+  protected calculateSimilarity(a: string, b: string, language: string): number {
     if (a === b) return 1;
     if (a.length === 0 || b.length === 0) return 0;
 
+    if (language.includes('zh')) {
+      const longer = a.length > b.length ? a : b;
+      const shorter = a.length > b.length ? b : a;
+      return (longer.length - this.editDistance(longer, shorter)) / longer.length;
+    }
+
+    const wordsA = a.split(' ').filter(Boolean);
+    const wordsB = b.split(' ').filter(Boolean);
+    const setA = new Set(wordsA);
+    const setB = new Set(wordsB);
+    const intersection = [...setA].filter((word) => setB.has(word)).length;
+    const tokenScore = (2 * intersection) / (setA.size + setB.size || 1);
+
     const longer = a.length > b.length ? a : b;
     const shorter = a.length > b.length ? b : a;
-    const longerLength = longer.length;
+    const charScore = (longer.length - this.editDistance(longer, shorter)) / longer.length;
 
-    if (longerLength === 0) return 1.0;
+    return tokenScore * 0.55 + charScore * 0.45;
+  }
 
-    return (longerLength - this.editDistance(longer, shorter)) / longerLength;
+  private normalizeSpeechText(input: string, language: string): string {
+    const simplifiedMap: Record<string, string> = {
+      '幫': '帮',
+      '謝': '谢',
+      '藥': '药',
+      '醫': '医',
+      '臺': '台',
+      '覺': '觉',
+      '嗎': '吗',
+      '請': '请',
+      '聽': '听',
+      '說': '说',
+      '話': '话',
+    };
+
+    let text = input
+      .toLowerCase()
+      .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
+      .replace(/[.,!?;:'"()\[\]{}，。！？；：「」『』（）]/g, ' ')
+      .trim();
+
+    if (language.includes('zh')) {
+      text = text
+        .split('')
+        .map((char) => simplifiedMap[char] || char)
+        .join('')
+        .replace(/\s+/g, '');
+      return text;
+    }
+
+    return text.replace(/\s+/g, ' ');
   }
 
   private editDistance(s1: string, s2: string): number {
