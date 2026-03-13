@@ -16,7 +16,7 @@ import { useFontSize } from '../../hooks/useFontSize';
 const { width } = Dimensions.get('window');
 
 interface FeatureCardProps {
-  iconName: React.ComponentProps<typeof Ionicons>['name'];
+  iconName: string;
   title: string;
   description: string;
   route: string;
@@ -33,7 +33,7 @@ function FeatureCard({ iconName, title, description, color, onPress }: FeatureCa
       style={[styles.featureCard, { borderLeftColor: color, borderLeftWidth: 6 }]}
       accessibilityRole="button"
     >
-      <Ionicons name={iconName} size={34} color={color} style={styles.featureIcon} />
+      <Ionicons name={iconName as React.ComponentProps<typeof Ionicons>['name']} size={34} color={color} style={styles.featureIcon} />
       <View style={styles.featureText}>
         <Text style={[styles.featureTitle, { fontSize: scale(20) }]}>{title}</Text>
         <Text style={[styles.featureDesc, { fontSize: scale(15) }]}>{description}</Text>
