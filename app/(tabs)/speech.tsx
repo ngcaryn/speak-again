@@ -5,6 +5,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '../../constants/colors';
 import { BigButton } from '../../components/ui/BigButton';
@@ -13,6 +14,7 @@ import { ProgressBar } from '../../components/ui/ProgressBar';
 import { useAppStore } from '../../store/appStore';
 import { useFontSize } from '../../hooks/useFontSize';
 import { useAI } from '../../hooks/useAI';
+import { useSpeech } from '../../hooks/useSpeech';
 import type { SpeechFeedback } from '../../services/ai/AIProvider';
 
 type RecordState = 'idle' | 'recording' | 'processing' | 'result';
@@ -26,6 +28,7 @@ export default function SpeechScreen() {
   const { scale } = useFontSize();
   const { settings, recordExercise } = useAppStore();
   const ai = useAI();
+  const speechProvider = useSpeech();
 
   const [state, setState] = useState<RecordState>('idle');
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -112,16 +115,17 @@ export default function SpeechScreen() {
       const uri = recording.getURI();
       setRecording(null);
 
-      // TODO (production): Replace simulatedSpoken with actual ASR output.
-      // Pass `uri` to the configured SpeechProvider.recognize(uri, language),
-      // which returns a SpeechResult.text to compare against currentWord.
-      // Example: const { text: simulatedSpoken } = await speechProvider.recognize(uri, i18n.language);
-      const simulatedSpoken = currentWord; // Placeholder: treats target as spoken for demo/offline mode
-      setSpokenText(simulatedSpoken);
+      if (!uri) {
+        throw new Error(t('speech.encourageRepeat'));
+      }
+
+      const recognition = await speechProvider.recognize(uri, i18n.language);
+      const recognizedText = (recognition.text || '').trim();
+      setSpokenText(recognizedText);
 
       const result = await ai.generateSpeechFeedback(
         currentWord,
-        simulatedSpoken,
+        recognizedText,
         i18n.language
       );
       setFeedback(result);
@@ -171,7 +175,6 @@ export default function SpeechScreen() {
             onPress={speakTargetWord}
             variant="outline"
             size="medium"
-            emoji="🔊"
             style={styles.listenButton}
           />
         </Card>
@@ -186,7 +189,7 @@ export default function SpeechScreen() {
               accessibilityRole="button"
               accessibilityLabel={t('speech.record')}
             >
-              <Text style={styles.micEmoji}>🎤</Text>
+              <Ionicons name="mic" size={48} color={Colors.buttonText} />
               <Text style={[styles.recordText, { fontSize: scale(22) }]}>{t('speech.record')}</Text>
             </TouchableOpacity>
           </View>
@@ -195,7 +198,7 @@ export default function SpeechScreen() {
         {state === 'recording' && (
           <View style={styles.recordSection}>
             <Animated.View style={[styles.recordingIndicator, { transform: [{ scale: pulseAnim }] }]}>
-              <Text style={styles.micEmoji}>🎤</Text>
+              <Ionicons name="mic" size={48} color={Colors.buttonText} />
             </Animated.View>
             <Text style={[styles.recordingText, { fontSize: scale(22) }]}>{t('speech.recording')}</Text>
             <BigButton
@@ -203,7 +206,6 @@ export default function SpeechScreen() {
               onPress={stopRecording}
               variant="danger"
               size="large"
-              emoji="⏹️"
               style={{ marginTop: 16 }}
             />
           </View>
@@ -211,7 +213,7 @@ export default function SpeechScreen() {
 
         {state === 'processing' && (
           <View style={styles.recordSection}>
-            <Text style={styles.processEmoji}>⚙️</Text>
+            <Ionicons name="sync" size={56} color={Colors.textSecondary} style={styles.processIcon} />
             <Text style={[styles.recordingText, { fontSize: scale(22) }]}>{t('speech.processing')}</Text>
           </View>
         )}
@@ -227,6 +229,10 @@ export default function SpeechScreen() {
 
             <Text style={[styles.feedbackText, { fontSize: scale(22) }]}>{feedback.feedback}</Text>
 
+            <Text style={[styles.transcript, { fontSize: scale(16) }]}>
+              {spokenText || t('speech.encourageRepeat')}
+            </Text>
+
             {feedback.suggestions.map((s, i) => (
               <Text key={i} style={[styles.suggestion, { fontSize: scale(16) }]}>• {s}</Text>
             ))}
@@ -237,7 +243,6 @@ export default function SpeechScreen() {
                 onPress={tryAgain}
                 variant="outline"
                 size="medium"
-                emoji="🔄"
                 style={{ flex: 1, marginRight: 8 }}
               />
               <BigButton
@@ -245,7 +250,6 @@ export default function SpeechScreen() {
                 onPress={nextWord}
                 variant="primary"
                 size="medium"
-                emoji="➡️"
                 style={{ flex: 1 }}
               />
             </View>
@@ -292,7 +296,6 @@ const styles = StyleSheet.create({
     elevation: 8,
     marginBottom: 16,
   },
-  micEmoji: { fontSize: 52 },
   recordText: { color: Colors.primary, fontWeight: '700', marginTop: 8 },
   recordingIndicator: {
     backgroundColor: Colors.error,
@@ -303,11 +306,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   recordingText: { color: Colors.error, fontWeight: '700', marginTop: 16 },
-  processEmoji: { fontSize: 64, marginBottom: 16 },
+  processIcon: { marginBottom: 16 },
   resultCard: { alignItems: 'center' },
   resultScore: { fontWeight: '900' },
   resultScoreLabel: { color: Colors.textSecondary, marginBottom: 12 },
   feedbackText: { fontWeight: '700', color: Colors.text, textAlign: 'center', marginVertical: 16 },
+  transcript: { color: Colors.textSecondary, marginBottom: 10, textAlign: 'center' },
   suggestion: { color: Colors.textSecondary, marginBottom: 4, alignSelf: 'flex-start' },
   resultActions: { flexDirection: 'row', marginTop: 16, width: '100%' },
   wordNav: { flexDirection: 'row', justifyContent: 'center', marginTop: 16, gap: 8 },
