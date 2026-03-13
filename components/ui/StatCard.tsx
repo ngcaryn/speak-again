@@ -1,20 +1,26 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { useFontSize } from '../../hooks/useFontSize';
 
 interface StatCardProps {
-  emoji: string;
+  emoji?: string;
+  iconName?: React.ComponentProps<typeof Ionicons>['name'];
   value: string | number;
   label: string;
   color?: string;
 }
 
-export function StatCard({ emoji, value, label, color = Colors.primary }: StatCardProps) {
+export function StatCard({ emoji, iconName, value, label, color = Colors.primary }: StatCardProps) {
   const { scale } = useFontSize();
   return (
     <View style={[styles.card, { borderTopColor: color, borderTopWidth: 4 }]}>
-      <Text style={styles.emoji}>{emoji}</Text>
+      {iconName ? (
+        <Ionicons name={iconName} size={28} color={color} style={styles.icon} />
+      ) : (
+        <Text style={styles.emoji}>{emoji}</Text>
+      )}
       <Text style={[styles.value, { fontSize: scale(28), color }]}>{value}</Text>
       <Text style={[styles.label, { fontSize: scale(14) }]}>{label}</Text>
     </View>
@@ -38,6 +44,9 @@ const styles = StyleSheet.create({
   emoji: {
     fontSize: 32,
     marginBottom: 4,
+  },
+  icon: {
+    marginBottom: 6,
   },
   value: {
     fontWeight: '800',
