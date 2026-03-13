@@ -1,13 +1,15 @@
 import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 
-function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
+function TabIcon({ name, focused }: { name: React.ComponentProps<typeof Ionicons>['name']; focused: boolean }) {
   return (
-    <Text style={{ fontSize: focused ? 28 : 24, opacity: focused ? 1 : 0.6 }}>
-      {emoji}
-    </Text>
+    <Ionicons
+      name={name}
+      size={focused ? 26 : 22}
+      color={focused ? Colors.tabBarActive : Colors.tabBarInactive}
+    />
   );
 }
 
@@ -38,49 +40,49 @@ export default function TabLayout() {
         name="index"
         options={{
           title: t('nav.home'),
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name="home" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="speech"
         options={{
           title: t('nav.speech'),
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🗣️" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name="mic" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="pictures"
         options={{
           title: t('nav.pictures'),
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🖼️" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name="images" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="cognitive"
         options={{
           title: t('nav.cognitive'),
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🧠" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name="grid" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="camera"
         options={{
           title: t('nav.camera'),
-          tabBarIcon: ({ focused }) => <TabIcon emoji="📷" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name="camera" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="progress"
         options={{
           title: t('nav.progress'),
-          tabBarIcon: ({ focused }) => <TabIcon emoji="📊" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name="bar-chart" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: t('nav.settings'),
-          tabBarIcon: ({ focused }) => <TabIcon emoji="⚙️" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name="settings" focused={focused} />,
         }}
       />
     </Tabs>
