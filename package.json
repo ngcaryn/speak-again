@@ -10,7 +10,8 @@
     "sync:watch": "powershell -ExecutionPolicy Bypass -File ./scripts/auto-sync.ps1",
     "sync:task:register": "powershell -ExecutionPolicy Bypass -File ./scripts/register-autosync-task.ps1",
     "sync:startup:disable": "powershell -ExecutionPolicy Bypass -File ./scripts/disable-startup-launcher.ps1",
-    "sync:task:status": "powershell -ExecutionPolicy Bypass -File ./scripts/check-autosync-task.ps1"
+    "sync:task:status": "powershell -ExecutionPolicy Bypass -File ./scripts/check-autosync-task.ps1",
+    "build:apk": "eas build --platform android --profile preview"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
