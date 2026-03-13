@@ -5,6 +5,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Speech from 'expo-speech';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '../../constants/colors';
 import { BigButton } from '../../components/ui/BigButton';
@@ -77,13 +78,12 @@ export default function CameraScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.permissionView}>
-          <Text style={styles.permissionEmoji}>📷</Text>
+          <Ionicons name="camera" size={72} color={Colors.primary} style={styles.permissionIcon} />
           <Text style={[styles.permissionText, { fontSize: scale(22) }]}>{t('gesture.permission')}</Text>
           <BigButton
             title={t('gesture.permissionButton')}
             onPress={requestPermission}
             size="large"
-            emoji="📷"
             fullWidth
           />
         </View>
@@ -119,7 +119,6 @@ export default function CameraScreen() {
                   onPress={analyzeCapture}
                   loading={isAnalyzing}
                   size="large"
-                  emoji="🔍"
                   style={styles.captureButton}
                 />
                 <BigButton
@@ -127,7 +126,6 @@ export default function CameraScreen() {
                   onPress={() => { setIsActive(false); setDetectedItem(null); }}
                   variant="danger"
                   size="medium"
-                  emoji="⏹️"
                   style={styles.stopButton}
                 />
               </View>
@@ -136,13 +134,12 @@ export default function CameraScreen() {
         </View>
       ) : (
         <View style={styles.startSection}>
-          <Text style={styles.cameraOffEmoji}>📷</Text>
+          <Ionicons name="camera-outline" size={72} color={Colors.textSecondary} style={styles.cameraOffIcon} />
           <Text style={[styles.instructions, { fontSize: scale(18) }]}>{t('gesture.instructions')}</Text>
           <BigButton
             title={t('gesture.startCamera')}
             onPress={() => setIsActive(true)}
             size="xlarge"
-            emoji="📷"
             fullWidth
           />
         </View>
@@ -184,7 +181,7 @@ const styles = StyleSheet.create({
   title: { fontWeight: '800', color: Colors.text, marginBottom: 4 },
   subtitle: { color: Colors.textSecondary },
   permissionView: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
-  permissionEmoji: { fontSize: 80, marginBottom: 24 },
+  permissionIcon: { marginBottom: 24 },
   permissionText: { fontWeight: '600', color: Colors.text, textAlign: 'center', marginBottom: 24 },
   cameraContainer: { height: 280, margin: 16, borderRadius: 20, overflow: 'hidden' },
   camera: { flex: 1 },
@@ -204,7 +201,7 @@ const styles = StyleSheet.create({
   captureButton: { flex: 1 },
   stopButton: { flex: 0 },
   startSection: { alignItems: 'center', padding: 24 },
-  cameraOffEmoji: { fontSize: 80, marginBottom: 16 },
+  cameraOffIcon: { marginBottom: 16 },
   instructions: { color: Colors.textSecondary, textAlign: 'center', marginBottom: 24, fontWeight: '500', lineHeight: 28 },
   detectionCard: { marginHorizontal: 16 },
   detectedLabel: { color: Colors.textSecondary, fontWeight: '600', marginBottom: 8 },
